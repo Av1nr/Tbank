@@ -6,9 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import academy.backend.market_pulse.history.impl.PriceHistoryStoreSkeleton;
-import academy.backend.market_pulse.repository.store.impl.QuoteFileStoreSkeleton;
-import academy.backend.market_pulse.repository.store.impl.WatchlistStoreSkeleton;
+import academy.backend.market_pulse.history.impl.PriceHistoryFileStore;
+import academy.backend.market_pulse.repository.store.impl.QuoteFileStore;
+import academy.backend.market_pulse.repository.store.impl.WatchlistFileStore;
 import academy.backend.market_pulse.stat.Stat;
 import academy.backend.market_pulse.stat.impl.AverageChangeStat;
 import academy.backend.market_pulse.stat.impl.CountByCurrencyStat;
@@ -34,8 +34,6 @@ import academy.backend.market_pulse.repository.FileBackedQuoteRepository;
 import academy.backend.market_pulse.repository.InMemoryInstrumentRepository;
 import academy.backend.market_pulse.repository.InstrumentRepository;
 import academy.backend.market_pulse.repository.QuoteFileWatcher;
-import academy.backend.market_pulse.repository.store.QuoteFileStore;
-import academy.backend.market_pulse.repository.store.WatchlistStore;
 import academy.backend.market_pulse.service.QuoteService;
 import academy.backend.market_pulse.service.QuoteSource;
 
@@ -51,13 +49,13 @@ public class AppConfig {
     private final QuoteSource quoteSource;
     private final QuoteService quoteService;
 
-    private final WatchlistStore watchlistStore;
+    private final academy.backend.market_pulse.repository.store.WatchlistStore watchlistStore;
     private final Path watchlistPath;
     private final Watchlist watchlist;
 
     private final TInvestApiClient apiClient;
 
-    private final QuoteFileStore quoteFileStore;
+    private final academy.backend.market_pulse.repository.store.QuoteFileStore quoteFileStore;
     private final FileBackedQuoteRepository fileBackedQuoteRepository;
 
     private final PriceHistoryStore priceHistoryStore;
@@ -72,7 +70,7 @@ public class AppConfig {
 
         // Watchlist переживает перезапуск CLI — читается при старте, дописывается на диск сразу
         // при изменении (см. WatchCommand).
-        this.watchlistStore = new WatchlistStoreSkeleton();
+        this.watchlistStore = new WatchlistFileStore();
         this.watchlistPath = Path.of("data", "watchlist.json");
         this.watchlist = new Watchlist(watchlistStore.load(watchlistPath));
 
@@ -88,13 +86,13 @@ public class AppConfig {
         // Самостоятельная работа (см. «Требования к файловому хранилищу.md»): котировки
         // отслеживаемых инструментов — на диске, а не только в памяти процесса.
         // QuoteFileStoreReference — эталон для сверки в начале семинара 8.
-        this.quoteFileStore = new QuoteFileStoreSkeleton();
+        this.quoteFileStore = new QuoteFileStore();
         this.fileBackedQuoteRepository =
                 new FileBackedQuoteRepository(quoteFileStore, Path.of("data", "quotes.json"));
         new QuoteFileWatcher(fileBackedQuoteRepository).start();
 
         // История цен — для будущей статистики: новая точка (новый файл) на каждое update.
-        this.priceHistoryStore = new PriceHistoryStoreSkeleton();
+        this.priceHistoryStore = new PriceHistoryFileStore();
         this.historyDirectory = Path.of("data", "history");
 
         this.priceHistory = samplePriceHistory();

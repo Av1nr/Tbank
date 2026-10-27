@@ -16,7 +16,7 @@ import org.junit.jupiter.api.io.TempDir;
  * скопируйте этот файл, замените {@link #createStore} на свой класс (реализующий
  * {@link WatchlistStore}) и запустите тест.
  */
-public abstract class WatchlistStoreContractTest {
+public abstract class WatchlistFileStoreContractTest {
 
     protected abstract WatchlistStore createStore();
 
