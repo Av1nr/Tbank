@@ -19,7 +19,7 @@ public class Watchlist {
     public Watchlist() {
     }
 
-    /** Восстановление watchlist-а, сохранённого на диске (см. {@code WatchlistStore}, семинар 7). */
+    /** Восстановление watchlist-а, сохранённого на диске (см. {@code WatchlistFileStore}, семинар 7). */
     public Watchlist(Set<String> initialTickers) {
         initialTickers.forEach(this::add);
     }
